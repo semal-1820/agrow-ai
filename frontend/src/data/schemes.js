@@ -1,0 +1,38 @@
+export const schemes = [
+  {
+    id: 'pmegp',
+    name: 'PMEGP Loan Scheme',
+    eligible: true,
+    match: 92,
+    benefit: 'Up to ₹5,00,000 subsidy for enterprise expansion',
+    description: 'Higher subsidy support for rural micro-enterprises expanding operations or capacity.',
+    documents: ['Business Registration', 'Project Report', 'KYC'],
+  },
+  {
+    id: 'kisan-credit',
+    name: 'Kisan Credit Card',
+    eligible: true,
+    match: 88,
+    benefit: 'Flexible working capital credit at concessional interest',
+    description: 'Short-term credit support for agricultural and allied activities including dairy.',
+    documents: ['Land Record', 'KYC', 'Bank Statement'],
+  },
+  {
+    id: 'dairy-dev',
+    name: 'Dairy Entrepreneurship Development Scheme',
+    eligible: true,
+    match: 90,
+    benefit: 'Capital subsidy for dairy infrastructure upgrade',
+    description: 'Supports setup and modernization of dairy farming infrastructure.',
+    documents: ['Business Registration', 'Asset Details'],
+  },
+  {
+    id: 'crop-insurance',
+    name: 'Pradhan Mantri Fasal Bima Yojana',
+    eligible: false,
+    match: 34,
+    benefit: 'Crop loss protection against weather shocks',
+    description: 'Applicable primarily to crop farming enterprises with registered land holdings.',
+    documents: ['Land Record', 'Sowing Certificate'],
+  },
+]
