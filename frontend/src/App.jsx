@@ -27,6 +27,7 @@ import Settings from './pages/Settings/Settings'
 
 import OfficerDashboard from './pages/Officer/OfficerDashboard'
 import EnterpriseRegistry from './pages/Officer/EnterpriseRegistry/EnterpriseRegistry'
+import EnterpriseDetail from './pages/Officer/EnterpriseDetail/EnterpriseDetail'
 import VillageAnalytics from './pages/Officer/VillageAnalytics/VillageAnalytics'
 import RiskMonitoring from './pages/Officer/RiskMonitoring/RiskMonitoring'
 import OfficerAlerts from './pages/Officer/Alerts/OfficerAlerts'
@@ -81,6 +82,7 @@ export default function App() {
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<OfficerDashboard />} />
               <Route path="enterprise-registry" element={<EnterpriseRegistry />} />
+              <Route path="enterprise-registry/:id" element={<EnterpriseDetail />} />
               <Route path="village-analytics" element={<VillageAnalytics />} />
               <Route path="risk-monitoring" element={<RiskMonitoring />} />
               <Route path="reports" element={<OfficerReports />} />

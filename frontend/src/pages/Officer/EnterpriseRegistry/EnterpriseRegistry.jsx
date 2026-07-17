@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import PageHeader from '../../../components/ui/PageHeader'
 import Card from '../../../components/ui/Card'
 import Badge from '../../../components/ui/Badge'
@@ -9,6 +10,7 @@ import { HiOutlineMagnifyingGlass } from 'react-icons/hi2'
 const riskTone = { Low: 'low', Medium: 'medium', High: 'high' }
 
 export default function EnterpriseRegistry() {
+  const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [riskFilter, setRiskFilter] = useState('All')
 
@@ -49,7 +51,11 @@ export default function EnterpriseRegistry() {
           <Thead><Th>Enterprise ID</Th><Th>Name</Th><Th>Owner</Th><Th>Village</Th><Th>Sector</Th><Th>Risk</Th><Th>Status</Th></Thead>
           <tbody>
             {filtered.map((e) => (
-              <Tr key={e.id}>
+              <Tr
+                key={e.id}
+                className="cursor-pointer"
+                onClick={() => navigate(`/officer/enterprise-registry/${e.id}`)}
+              >
                 <Td>{e.id}</Td><Td className="font-medium">{e.name}</Td><Td>{e.owner}</Td><Td>{e.village}</Td><Td>{e.sector}</Td>
                 <Td><Badge tone={riskTone[e.risk]}>{e.risk}</Badge></Td>
                 <Td><Badge tone="neutral">{e.status}</Badge></Td>
