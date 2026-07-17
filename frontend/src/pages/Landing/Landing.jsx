@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { HiOutlineArrowRight, HiOutlineChartBar, HiOutlineShieldCheck, HiOutlineGift } from 'react-icons/hi2'
 import Button from '../../components/ui/Button'
 import Card from '../../components/ui/Card'
+import ThemeToggle from '../../components/ui/ThemeToggle'
 
 const stats = [
   { value: '12.4k+', label: 'Enterprises Onboarded' },
@@ -28,6 +29,7 @@ export default function Landing() {
           <a href="#faq">FAQ</a>
         </div>
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <Link to="/login" className="text-sm font-semibold text-ink-dim dark:text-ink-dark-dim">Login</Link>
           <Link to="/register">
             <Button size="sm">Get Started</Button>

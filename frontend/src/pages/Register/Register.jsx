@@ -1,6 +1,7 @@
 import { useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Button from '../../components/ui/Button'
+import ThemeToggle from '../../components/ui/ThemeToggle'
 import { useAuth } from '../../context/AuthContext'
 
 const inputCls = "mt-1 w-full border border-border dark:border-border-dark rounded-xl px-3 py-2.5 text-sm bg-transparent outline-none focus:border-primary-500"
@@ -16,7 +17,8 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2 bg-surface dark:bg-surface-dark">
+    <div className="min-h-screen grid lg:grid-cols-2 bg-surface dark:bg-surface-dark relative">
+      <div className="absolute top-4 right-4 z-10"><ThemeToggle /></div>
       <div className="flex items-center justify-center p-6 order-2 lg:order-1">
         <motion.form
           initial={{ opacity: 0, y: 12 }}

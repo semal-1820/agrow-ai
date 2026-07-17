@@ -29,9 +29,12 @@ import OfficerDashboard from './pages/Officer/OfficerDashboard'
 import EnterpriseRegistry from './pages/Officer/EnterpriseRegistry/EnterpriseRegistry'
 import EnterpriseDetail from './pages/Officer/EnterpriseDetail/EnterpriseDetail'
 import VillageAnalytics from './pages/Officer/VillageAnalytics/VillageAnalytics'
+import DistrictAnalytics from './pages/Officer/DistrictAnalytics/DistrictAnalytics'
 import RiskMonitoring from './pages/Officer/RiskMonitoring/RiskMonitoring'
 import OfficerAlerts from './pages/Officer/Alerts/OfficerAlerts'
 import OfficerReports from './pages/Officer/Reports/OfficerReports'
+import SchemeManagement from './pages/Officer/SchemeManagement/SchemeManagement'
+import AIInsights from './pages/Officer/AIInsights/AIInsights'
 
 export default function App() {
   return (
@@ -84,6 +87,9 @@ export default function App() {
               <Route path="enterprise-registry" element={<EnterpriseRegistry />} />
               <Route path="enterprise-registry/:id" element={<EnterpriseDetail />} />
               <Route path="village-analytics" element={<VillageAnalytics />} />
+              <Route path="district-analytics" element={<DistrictAnalytics />} />
+              <Route path="scheme-management" element={<SchemeManagement />} />
+              <Route path="ai-insights" element={<AIInsights />} />
               <Route path="risk-monitoring" element={<RiskMonitoring />} />
               <Route path="reports" element={<OfficerReports />} />
               <Route path="alerts" element={<OfficerAlerts />} />

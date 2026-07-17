@@ -3,10 +3,9 @@ import { createContext, useContext, useEffect, useState } from 'react'
 const ThemeContext = createContext(null)
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => {
-    if (typeof window === 'undefined') return 'light'
-    return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-  })
+  // Always default to light — the app should open bright regardless of the
+  // visitor's OS/browser theme setting. Users can switch to dark manually.
+  const [theme, setTheme] = useState('light')
 
   useEffect(() => {
     const root = document.documentElement

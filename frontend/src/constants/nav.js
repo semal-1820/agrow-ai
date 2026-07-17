@@ -3,7 +3,7 @@ import {
   HiOutlineChartBar, HiOutlineShieldExclamation, HiOutlineHeart,
   HiOutlineGift, HiOutlineDocumentText, HiOutlineBell, HiOutlineUserCircle,
   HiOutlineCog6Tooth, HiOutlineClipboardDocumentList, HiOutlineMapPin,
-  HiOutlineExclamationTriangle,
+  HiOutlineExclamationTriangle, HiOutlineBuildingLibrary, HiOutlineSparkles,
 } from 'react-icons/hi2'
 
 export const entrepreneurNav = [
@@ -24,7 +24,10 @@ export const officerNav = [
   { label: 'Dashboard', to: '/officer/dashboard', icon: HiOutlineSquares2X2 },
   { label: 'Enterprise Registry', to: '/officer/enterprise-registry', icon: HiOutlineClipboardDocumentList },
   { label: 'Village Analytics', to: '/officer/village-analytics', icon: HiOutlineMapPin },
+  { label: 'District Analytics', to: '/officer/district-analytics', icon: HiOutlineBuildingLibrary },
   { label: 'Risk Monitoring', to: '/officer/risk-monitoring', icon: HiOutlineExclamationTriangle },
+  { label: 'Scheme Management', to: '/officer/scheme-management', icon: HiOutlineGift },
+  { label: 'AI Insights', to: '/officer/ai-insights', icon: HiOutlineSparkles },
   { label: 'Reports', to: '/officer/reports', icon: HiOutlineDocumentText },
   { label: 'Alerts', to: '/officer/alerts', icon: HiOutlineBell },
   { label: 'Profile', to: '/officer/profile', icon: HiOutlineUserCircle },
