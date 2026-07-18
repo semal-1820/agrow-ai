@@ -1,96 +1,345 @@
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
+import { useEffect, useState } from 'react'
 import PageHeader from '../../../components/ui/PageHeader'
 import Card from '../../../components/ui/Card'
 import Badge from '../../../components/ui/Badge'
-import { highRiskEnterprises, sectorDistribution } from '../../../data/officer'
-import { HiOutlineSparkles, HiOutlineExclamationTriangle, HiOutlineArrowTrendingUp, HiOutlineLightBulb } from 'react-icons/hi2'
 
-const predictedTrends = [
-  { month: 'Aug', highRisk: 148 }, { month: 'Sep', highRisk: 154 }, { month: 'Oct', highRisk: 146 },
-  { month: 'Nov', highRisk: 139 }, { month: 'Dec', highRisk: 132 }, { month: 'Jan', highRisk: 128 },
-]
+import {
+  HiOutlineSparkles,
+  HiOutlineExclamationTriangle,
+  HiOutlineLightBulb,
+} from 'react-icons/hi2'
 
-const interventions = [
-  { title: 'Feed-cost subsidy outreach', target: '38 dairy enterprises in Sundarpur & Khajuria', impact: 'High', reason: 'Feed cost volatility is the top driver of rising risk scores in these villages.' },
-  { title: 'EMI restructuring review', target: '17 enterprises with 2+ upcoming EMIs in 30 days', impact: 'High', reason: 'Clustered EMI due dates are the leading cause of short-term liquidity stress.' },
-  { title: 'Monsoon buffer advisory', target: 'All dairy & crop enterprises district-wide', impact: 'Medium', reason: 'Seasonal cash flow dip is predictable and preventable with early advisory.' },
-]
+import {
+  getAIInsights,
+} from '../../../services/officerService'
 
 export default function AIInsights() {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    const loadInsights = async () => {
+      try {
+        setLoading(true)
+        setError('')
+
+        const response = await getAIInsights()
+
+        setData(response)
+      } catch (err) {
+        console.error(
+          'AI insights loading error:',
+          err
+        )
+
+        setError(
+          err.response?.data?.message ||
+            'Unable to load AI insights.'
+        )
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadInsights()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        Loading AI insights...
+      </div>
+    )
+  }
+
+  const highRiskEnterprises =
+    data?.highRiskEnterprises || []
+
+  const sectorDistribution =
+    data?.sectorDistribution || []
+
+  const interventions =
+    data?.interventions || []
+
+  const portfolio =
+    data?.portfolio || {
+      totalEnterprises: 0,
+      highRisk: 0,
+      mediumRisk: 0,
+      lowRisk: 0,
+    }
+
   return (
     <div>
       <PageHeader
-        breadcrumb={[{ label: 'Dashboard', href: '/officer/dashboard' }, { label: 'AI Insights Center' }]}
+        breadcrumb={[
+          {
+            label: 'Dashboard',
+            href: '/officer/dashboard',
+          },
+          {
+            label: 'AI Insights Center',
+          },
+        ]}
         title="AI Insights Center"
-        description="Model-driven risk trends, forecasts and suggested interventions across your portfolio."
+        description="Data-driven risk insights and suggested interventions across your portfolio."
       />
 
-      <div className="grid lg:grid-cols-3 gap-4 mb-4">
-        <Card className="lg:col-span-2">
-          <div className="flex items-center gap-2 mb-4">
-            <HiOutlineArrowTrendingUp className="text-primary-600 dark:text-primary-300" size={18} />
-            <h3 className="font-semibold">Predicted High-Risk Trend (6 Months)</h3>
-          </div>
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={predictedTrends}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E6EBF0" />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} width={40} />
-              <Tooltip />
-              <Line dataKey="highRisk" stroke="#D92D20" strokeWidth={2.5} dot={{ r: 3 }} />
-            </LineChart>
-          </ResponsiveContainer>
-          <p className="text-xs text-ink-dim dark:text-ink-dark-dim mt-2">
-            High-risk enterprise count is projected to decline gradually if current intervention recommendations are followed.
+      {error && (
+        <Card className="mb-4">
+          <p className="text-sm text-red-500">
+            {error}
+          </p>
+        </Card>
+      )}
+
+      <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
+        <Card>
+          <p className="text-xs text-ink-dim dark:text-ink-dark-dim">
+            Total Enterprises
+          </p>
+
+          <p className="text-2xl font-bold mt-2">
+            {portfolio.totalEnterprises}
           </p>
         </Card>
 
         <Card>
+          <p className="text-xs text-ink-dim dark:text-ink-dark-dim">
+            High Risk
+          </p>
+
+          <p className="text-2xl font-bold mt-2 text-red-600 dark:text-red-400">
+            {portfolio.highRisk}
+          </p>
+        </Card>
+
+        <Card>
+          <p className="text-xs text-ink-dim dark:text-ink-dark-dim">
+            Medium Risk
+          </p>
+
+          <p className="text-2xl font-bold mt-2">
+            {portfolio.mediumRisk}
+          </p>
+        </Card>
+
+        <Card>
+          <p className="text-xs text-ink-dim dark:text-ink-dark-dim">
+            Low Risk
+          </p>
+
+          <p className="text-2xl font-bold mt-2 text-primary-600 dark:text-primary-300">
+            {portfolio.lowRisk}
+          </p>
+        </Card>
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-4 mb-4">
+        <Card className="lg:col-span-2">
           <div className="flex items-center gap-2 mb-4">
-            <HiOutlineExclamationTriangle className="text-red-500" size={18} />
-            <h3 className="font-semibold">Top Risks Right Now</h3>
+            <HiOutlineSparkles
+              className="text-accent"
+              size={18}
+            />
+
+            <h3 className="font-semibold">
+              Portfolio Risk Overview
+            </h3>
           </div>
-          <ul className="space-y-3">
-            {highRiskEnterprises.map((e) => (
-              <li key={e.id} className="flex items-center justify-between text-sm">
-                <span>{e.name}</span>
-                <Badge tone="high">{e.riskScore}</Badge>
-              </li>
-            ))}
-          </ul>
+
+          <div className="grid sm:grid-cols-3 gap-4">
+            <div className="border border-border dark:border-border-dark rounded-xl p-4">
+              <p className="text-xs text-ink-dim dark:text-ink-dark-dim">
+                High Risk
+              </p>
+
+              <p className="text-2xl font-bold mt-2">
+                {portfolio.highRisk}
+              </p>
+            </div>
+
+            <div className="border border-border dark:border-border-dark rounded-xl p-4">
+              <p className="text-xs text-ink-dim dark:text-ink-dark-dim">
+                Medium Risk
+              </p>
+
+              <p className="text-2xl font-bold mt-2">
+                {portfolio.mediumRisk}
+              </p>
+            </div>
+
+            <div className="border border-border dark:border-border-dark rounded-xl p-4">
+              <p className="text-xs text-ink-dim dark:text-ink-dark-dim">
+                Low Risk
+              </p>
+
+              <p className="text-2xl font-bold mt-2">
+                {portfolio.lowRisk}
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        <Card>
+          <div className="flex items-center gap-2 mb-4">
+            <HiOutlineExclamationTriangle
+              className="text-red-500"
+              size={18}
+            />
+
+            <h3 className="font-semibold">
+              Top Risks Right Now
+            </h3>
+          </div>
+
+          {highRiskEnterprises.length > 0 ? (
+            <ul className="space-y-3">
+              {highRiskEnterprises.map(
+                (enterprise) => (
+                  <li
+                    key={enterprise.id}
+                    className="flex items-center justify-between gap-3 text-sm"
+                  >
+                    <div>
+                      <p className="font-medium">
+                        {enterprise.name}
+                      </p>
+
+                      <p className="text-xs text-ink-dim dark:text-ink-dark-dim">
+                        {enterprise.village ||
+                          'Unknown village'}
+                      </p>
+                    </div>
+
+                    <Badge tone="high">
+                      {enterprise.riskScore}
+                    </Badge>
+                  </li>
+                )
+              )}
+            </ul>
+          ) : (
+            <p className="text-sm text-ink-dim dark:text-ink-dark-dim">
+              No high-risk enterprises found.
+            </p>
+          )}
         </Card>
       </div>
 
       <Card className="mb-4">
         <div className="flex items-center gap-2 mb-4">
-          <HiOutlineSparkles className="text-accent" size={18} />
-          <h3 className="font-semibold">Suggested Interventions</h3>
+          <HiOutlineSparkles
+            className="text-accent"
+            size={18}
+          />
+
+          <h3 className="font-semibold">
+            Suggested Interventions
+          </h3>
         </div>
-        <div className="grid md:grid-cols-3 gap-4">
-          {interventions.map((i) => (
-            <div key={i.title} className="border border-border dark:border-border-dark rounded-xl p-4">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="font-semibold text-sm">{i.title}</h4>
-                <Badge tone={i.impact === 'High' ? 'high' : 'medium'}>{i.impact} impact</Badge>
-              </div>
-              <p className="text-xs text-ink-dim dark:text-ink-dark-dim mb-2">{i.target}</p>
-              <p className="text-xs text-ink-dim dark:text-ink-dark-dim border-t border-border dark:border-border-dark pt-2">{i.reason}</p>
-            </div>
-          ))}
-        </div>
+
+        {interventions.length > 0 ? (
+          <div className="grid md:grid-cols-3 gap-4">
+            {interventions.map(
+              (intervention, index) => (
+                <div
+                  key={
+                    intervention.title ||
+                    index
+                  }
+                  className="border border-border dark:border-border-dark rounded-xl p-4"
+                >
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h4 className="font-semibold text-sm">
+                      {intervention.title}
+                    </h4>
+
+                    <Badge
+                      tone={
+                        intervention.impact ===
+                        'High'
+                          ? 'high'
+                          : 'medium'
+                      }
+                    >
+                      {intervention.impact}{' '}
+                      impact
+                    </Badge>
+                  </div>
+
+                  <p className="text-xs text-ink-dim dark:text-ink-dark-dim mb-2">
+                    {intervention.target}
+                  </p>
+
+                  <p className="text-xs text-ink-dim dark:text-ink-dark-dim border-t border-border dark:border-border-dark pt-2">
+                    {intervention.reason}
+                  </p>
+                </div>
+              )
+            )}
+          </div>
+        ) : (
+          <p className="text-sm text-ink-dim dark:text-ink-dark-dim">
+            No intervention recommendations are currently available.
+          </p>
+        )}
       </Card>
 
-      <Card>
-        <div className="flex items-center gap-2 mb-1">
-          <HiOutlineLightBulb className="text-accent" size={18} />
-          <h3 className="font-semibold">Forecast Summary</h3>
-        </div>
-        <p className="text-sm text-ink-dim dark:text-ink-dark-dim">
-          Portfolio-wide cash flow is expected to dip 8-12% across dairy and poultry enterprises heading into monsoon,
-          consistent with prior-year seasonal patterns. Sectors most exposed: {sectorDistribution[0].name} and {sectorDistribution[2].name}.
-          Recommend prioritizing the feed-cost subsidy outreach intervention above before early August.
-        </p>
-      </Card>
+      <div className="grid lg:grid-cols-2 gap-4">
+        <Card>
+          <div className="flex items-center gap-2 mb-3">
+            <HiOutlineLightBulb
+              className="text-accent"
+              size={18}
+            />
+
+            <h3 className="font-semibold">
+              Risk Summary
+            </h3>
+          </div>
+
+          <p className="text-sm text-ink-dim dark:text-ink-dark-dim">
+            {data?.forecastSummary ||
+              'No risk summary is currently available.'}
+          </p>
+        </Card>
+
+        <Card>
+          <h3 className="font-semibold mb-4">
+            Sector Distribution
+          </h3>
+
+          {sectorDistribution.length > 0 ? (
+            <div className="space-y-3">
+              {sectorDistribution.map(
+                (sector, index) => (
+                  <div
+                    key={
+                      sector.name || index
+                    }
+                    className="flex items-center justify-between text-sm"
+                  >
+                    <span>
+                      {sector.name ||
+                        'Unknown Sector'}
+                    </span>
+
+                    <Badge tone="neutral">
+                      {sector.value}
+                    </Badge>
+                  </div>
+                )
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-ink-dim dark:text-ink-dark-dim">
+              No sector distribution data available.
+            </p>
+          )}
+        </Card>
+      </div>
     </div>
   )
 }

@@ -24,3 +24,11 @@ __pycache__/
 
 # Coverage
 coverage/
+node_modules/
+.env
+.env.*
+!.env.example
+backend/.env
+frontend/.env
+frontend/.env.local
+dist/
