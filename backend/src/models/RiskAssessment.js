@@ -20,6 +20,8 @@ const riskAssessmentSchema = new mongoose.Schema(
   }
 );
 
+riskAssessmentSchema.index({ enterprise: 1, createdAt: -1 });
+
 module.exports = mongoose.model(
   "RiskAssessment",
   riskAssessmentSchema

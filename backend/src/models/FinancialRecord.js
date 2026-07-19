@@ -24,6 +24,9 @@ const financialRecordSchema = new mongoose.Schema(
   }
 );
 
+financialRecordSchema.index({ enterprise: 1, month: -1 });
+financialRecordSchema.index({ enterprise: 1, createdAt: -1 });
+
 module.exports = mongoose.model(
   "FinancialRecord",
   financialRecordSchema

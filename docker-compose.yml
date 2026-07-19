@@ -1,0 +1,77 @@
+# One-command local deployment for Agrow AI (Module 8).
+#
+# Usage:
+#   docker compose up --build
+#
+# Then:
+#   Frontend:    http://localhost:5173
+#   Backend:     http://localhost:5000
+#   Health check: http://localhost:5000/health
+#   ML service:  http://localhost:8000
+#
+# Before running, copy backend/.env.example to backend/.env and fill in
+# real values (JWT_SECRET especially). MONGO_URI in .env is ignored here —
+# this compose file wires the backend to the "mongo" service below instead.
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: agrow-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ml-service:
+    build:
+      context: ./ml
+    container_name: agrow-ml
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+
+  backend:
+    build:
+      context: ./backend
+    container_name: agrow-backend
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+      ml-service:
+        condition: service_started
+    env_file:
+      - ./backend/.env
+    environment:
+      # Override just the two values that must point at other containers
+      # (not localhost) when running under compose.
+      MONGO_URI: mongodb://mongo:27017/agrow-ai
+      ML_SERVICE_URL: http://ml-service:8000
+    ports:
+      - "5000:5000"
+    volumes:
+      - backend-uploads:/app/uploads
+      - backend-logs:/app/logs
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:5000/api
+    container_name: agrow-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  mongo-data:
+  backend-uploads:
+  backend-logs:

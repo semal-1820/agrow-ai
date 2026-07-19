@@ -49,6 +49,10 @@ const enterpriseSchema = new mongoose.Schema(
   }
 );
 
+enterpriseSchema.index({ owner: 1 });
+enterpriseSchema.index({ district: 1, village: 1 });
+enterpriseSchema.index({ type: 1 });
+
 module.exports = mongoose.model(
   "Enterprise",
   enterpriseSchema

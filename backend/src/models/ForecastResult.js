@@ -90,6 +90,8 @@ const forecastSchema = new mongoose.Schema(
   }
 );
 
+forecastSchema.index({ enterprise: 1, createdAt: -1 });
+
 module.exports = mongoose.model(
   "ForecastResult",
   forecastSchema

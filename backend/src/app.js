@@ -2,8 +2,13 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const compression = require("compression");
 const cookieParser = require("cookie-parser");
 const path = require("path");
+
+const logger = require("./utils/logger");
+const { sanitizeRequest, preventParameterPollution } = require("./middleware/security");
+const systemRoutes = require("./routes/systemRoutes");
 
 const authRoutes = require("./routes/authRoutes");
 const enterpriseRoutes = require("./routes/enterpriseRoutes");
@@ -26,19 +31,56 @@ const { globalLimiter } = require("./middleware/rateLimiter");
 
 const app = express();
 
+// Trust the first proxy hop (Render/Railway/Nginx) so req.ip and secure
+// cookies behave correctly behind a reverse proxy in production.
+app.set("trust proxy", 1);
+
 // Middleware
-app.use(cors());
-app.use(helmet());
-app.use(morgan("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim());
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
+
+app.use(
+  helmet({
+    // Cross-Origin-Resource-Policy defaults to "same-site", which blocks
+    // the frontend (a different origin in dev/prod) from loading things
+    // like report PDFs served from /uploads.
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
+
+app.use(compression());
+
+// HTTP request logs go through the same logger as everything else instead
+// of a separate console.log stream, so they end up in logs/combined.log.
+app.use(morgan("combined", { stream: logger.httpStream }));
+
+// Request size limits — prevents oversized payloads (image dumps, huge
+// bodies) from tying up the event loop or exhausting memory.
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 app.use(cookieParser());
+
+// NoSQL-injection / XSS / HTTP-parameter-pollution guards (Module 1).
+app.use(sanitizeRequest);
+app.use(preventParameterPollution);
 
 // express-rate-limit was installed and built (middleware/rateLimiter.js)
 // but never applied anywhere. Applying the global limiter to every /api
 // route here; stricter per-route limiters (auth, forecast, officer) are
 // applied in their own route files.
 app.use("/api", globalLimiter);
+
+// Infrastructure health check (Module 4) — deliberately NOT under /api,
+// since /api/health is already the Enterprise Health Engine from Phase 2.
+app.use("/health", systemRoutes);
 
 // Root route
 app.get("/", (req, res) => {
