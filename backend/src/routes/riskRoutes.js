@@ -7,8 +7,13 @@ const {
   getRiskAssessment,
 } = require("../controllers/riskController");
 
-router.post("/:enterpriseId", assessRisk);
+const protect = require("../middleware/authMiddleware");
+const { validateObjectIdParam } = require("../middleware/validators");
 
-router.get("/:enterpriseId", getRiskAssessment);
+// SECURITY FIX: previously unauthenticated.
+router.use(protect);
+
+router.post("/:enterpriseId", validateObjectIdParam("enterpriseId"), assessRisk);
+router.get("/:enterpriseId", validateObjectIdParam("enterpriseId"), getRiskAssessment);
 
 module.exports = router;

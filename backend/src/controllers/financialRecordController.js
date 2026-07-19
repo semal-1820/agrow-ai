@@ -1,4 +1,5 @@
 const FinancialRecord = require("../models/FinancialRecord");
+const { generateAlertsForEnterprise } = require("../services/alertService");
 
 // Get all records
 exports.getFinancialRecords = async (req, res) => {
@@ -40,6 +41,14 @@ exports.createFinancialRecord = async (req, res) => {
     const record = await FinancialRecord.create(req.body);
 
     res.status(201).json(record);
+
+    // Fire-and-forget: alert generation must never affect the response
+    // that was already sent above.
+    if (record.enterprise) {
+      generateAlertsForEnterprise(record.enterprise).catch((err) =>
+        console.error("Post-create alert generation failed:", err.message)
+      );
+    }
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -61,6 +70,12 @@ exports.updateFinancialRecord = async (req, res) => {
     }
 
     res.json(record);
+
+    if (record.enterprise) {
+      generateAlertsForEnterprise(record.enterprise).catch((err) =>
+        console.error("Post-update alert generation failed:", err.message)
+      );
+    }
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

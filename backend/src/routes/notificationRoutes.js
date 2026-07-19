@@ -10,17 +10,18 @@ const {
 } = require("../controllers/notificationController");
 
 const authMiddleware = require("../middleware/authMiddleware");
+const { validateNotification, validateObjectIdParam } = require("../middleware/validators");
 
 router.use(authMiddleware);
 
 router.get("/", getNotifications);
 
-router.get("/:id", getNotification);
+router.get("/:id", validateObjectIdParam("id"), getNotification);
 
-router.post("/", createNotification);
+router.post("/", validateNotification, createNotification);
 
-router.put("/:id/read", markAsRead);
+router.put("/:id/read", validateObjectIdParam("id"), markAsRead);
 
-router.delete("/:id", deleteNotification);
+router.delete("/:id", validateObjectIdParam("id"), deleteNotification);
 
 module.exports = router;

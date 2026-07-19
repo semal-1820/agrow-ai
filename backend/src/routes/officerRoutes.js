@@ -15,10 +15,28 @@ const {
   getRiskHeatmap,
 } = require("../controllers/officerController");
 
+const { getAIDashboard } = require("../controllers/officerAiController");
+const { generateOfficerAlerts } = require("../services/alertService");
+const { officerLimiter } = require("../middleware/rateLimiter");
+
 router.use(protect);
 router.use(authorizeRoles("officer"));
+router.use(officerLimiter);
 
 router.get("/dashboard", getDashboard);
+
+// Module 6 - Officer AI Dashboard
+router.get("/ai-dashboard", getAIDashboard);
+
+// Module 4 - Smart Alert Engine (officer-side, aggregate alerts)
+router.post("/ai-alerts/generate", async (req, res) => {
+  try {
+    const created = await generateOfficerAlerts();
+    res.status(200).json({ generated: created.length, alerts: created });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 router.get(
   "/enterprises",

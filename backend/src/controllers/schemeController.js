@@ -1,8 +1,12 @@
 const GovernmentScheme = require("../models/GovernmentScheme");
 const Enterprise = require("../models/Enterprise");
+const FinancialRecord = require("../models/FinancialRecord");
 const {
   calculateSchemeMatch,
+  computeApplicationPriority,
+  estimateApprovalProbability,
 } = require("../services/schemeService");
+const { calculateRisk } = require("../services/riskService");
 
 // Get all government schemes
 exports.getSchemes = async (req, res) => {
@@ -51,6 +55,14 @@ exports.getEligibleSchemes = async (req, res) => {
 
     const schemes = await GovernmentScheme.find();
 
+    // Risk level feeds the approval-probability estimate below. If there
+    // are no financial records yet, risk is simply omitted from that
+    // estimate rather than guessed.
+    const records = await FinancialRecord.find({ enterprise: enterpriseId }).sort({
+      createdAt: 1,
+    });
+    const riskLevel = records.length > 0 ? calculateRisk(records).level : null;
+
     const recommendations = schemes
       .map((scheme) => {
         const match = calculateSchemeMatch(
@@ -65,6 +77,12 @@ exports.getEligibleSchemes = async (req, res) => {
           reasons: match.reasons,
           benefits: scheme.benefits,
           requiredDocuments: scheme.requiredDocuments,
+          // Module 8 additions:
+          eligibilityScore: match.matchPercentage,
+          applicationPriority: computeApplicationPriority(match.matchPercentage),
+          estimatedApprovalProbability: riskLevel
+            ? estimateApprovalProbability(match.matchPercentage, riskLevel)
+            : null,
         };
       })
       .filter((scheme) => scheme.matchPercentage > 0)

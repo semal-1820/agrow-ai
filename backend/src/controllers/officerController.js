@@ -798,3 +798,251 @@ exports.getRiskHeatmap = async (
     });
   }
 };
+
+// ==========================================
+// AI INSIGHTS (aggregated intelligence layer)
+// Reuses existing collections/aggregations rather
+// than duplicating risk/health/forecast logic.
+// ==========================================
+
+exports.getAIInsights = async (req, res) => {
+  try {
+    const [
+      districtStats,
+      villageStats,
+      sectorStats,
+      riskCounts,
+      highRiskEnterprises,
+      forecasts,
+      totalEnterprises,
+    ] = await Promise.all([
+      // District-wise enterprise counts + income (same shape as getDistrictAnalytics)
+      Enterprise.aggregate([
+        {
+          $group: {
+            _id: "$district",
+            totalEnterprises: { $sum: 1 },
+            averageIncome: { $avg: "$annualIncome" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            district: "$_id",
+            totalEnterprises: 1,
+            averageIncome: { $round: ["$averageIncome", 2] },
+          },
+        },
+      ]),
+
+      // Village-wise enterprise counts + income (same shape as getVillageAnalytics)
+      Enterprise.aggregate([
+        {
+          $group: {
+            _id: { village: "$village", district: "$district" },
+            totalEnterprises: { $sum: 1 },
+            averageIncome: { $avg: "$annualIncome" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            village: "$_id.village",
+            district: "$_id.district",
+            totalEnterprises: 1,
+            averageIncome: { $round: ["$averageIncome", 2] },
+          },
+        },
+      ]),
+
+      // Sector distribution (same shape as getSectorDistribution)
+      Enterprise.aggregate([
+        { $group: { _id: "$type", count: { $sum: 1 } } },
+        { $project: { _id: 0, sector: "$_id", count: 1 } },
+        { $sort: { count: -1 } },
+      ]),
+
+      // Risk level counts, reused from getDashboard's approach
+      RiskAssessment.aggregate([
+        { $group: { _id: "$level", count: { $sum: 1 } } },
+      ]),
+
+      // Top high-risk enterprises for the priority inspection list
+      RiskAssessment.find({ level: "High" })
+        .populate("enterprise", "name type village district state")
+        .sort({ score: -1 })
+        .limit(10),
+
+      // Latest forecast per enterprise (capped for performance)
+      ForecastResult.find()
+        .sort({ createdAt: -1 })
+        .limit(200)
+        .populate("enterprise", "name type village district state"),
+
+      Enterprise.countDocuments(),
+    ]);
+
+    // ---- District Health Summary ----
+    // Blend district enterprise stats with average risk score per district
+    const riskByDistrict = {};
+
+    const allRiskAssessments = await RiskAssessment.find()
+      .populate("enterprise", "district")
+      .lean();
+
+    allRiskAssessments.forEach((risk) => {
+      const district = risk.enterprise?.district || "Unknown";
+      if (!riskByDistrict[district]) {
+        riskByDistrict[district] = { totalScore: 0, count: 0 };
+      }
+      riskByDistrict[district].totalScore += risk.score || 0;
+      riskByDistrict[district].count += 1;
+    });
+
+    const districtHealthSummary = districtStats.map((d) => {
+      const riskInfo = riskByDistrict[d.district] || { totalScore: 0, count: 0 };
+      const averageRiskScore =
+        riskInfo.count > 0 ? Math.round(riskInfo.totalScore / riskInfo.count) : 0;
+
+      return {
+        district: d.district,
+        totalEnterprises: d.totalEnterprises,
+        averageIncome: d.averageIncome,
+        averageRiskScore,
+        healthLabel:
+          averageRiskScore >= 70
+            ? "Needs Attention"
+            : averageRiskScore >= 40
+            ? "Moderate"
+            : "Healthy",
+      };
+    });
+
+    // ---- Village Performance Summary ----
+    const villagePerformanceSummary = villageStats
+      .sort((a, b) => (b.averageIncome || 0) - (a.averageIncome || 0))
+      .slice(0, 15);
+
+    // ---- Risk Trends ----
+    const riskTrends = {
+      high: riskCounts.find((r) => r._id === "High")?.count || 0,
+      medium: riskCounts.find((r) => r._id === "Medium")?.count || 0,
+      low: riskCounts.find((r) => r._id === "Low")?.count || 0,
+    };
+
+    // ---- Forecast Summary ----
+    const forecastSummary = {
+      enterprisesForecasted: forecasts.length,
+      increasing: forecasts.filter((f) => f.trend === "Increasing").length,
+      stable: forecasts.filter((f) => f.trend === "Stable").length,
+      decreasing: forecasts.filter((f) => f.trend === "Decreasing").length,
+      averageConfidence: forecasts.length
+        ? Number(
+            (
+              forecasts.reduce((sum, f) => sum + (f.confidence || 0), 0) /
+              forecasts.length
+            ).toFixed(2)
+          )
+        : 0,
+      averageGrowthPercentage: forecasts.length
+        ? Number(
+            (
+              forecasts.reduce((sum, f) => sum + (f.growthPercentage || 0), 0) /
+              forecasts.length
+            ).toFixed(2)
+          )
+        : 0,
+    };
+
+    // ---- Growth Opportunities ----
+    const growthOpportunities = forecasts
+      .filter((f) => f.trend === "Increasing" && f.enterprise)
+      .sort((a, b) => (b.growthPercentage || 0) - (a.growthPercentage || 0))
+      .slice(0, 10)
+      .map((f) => ({
+        enterprise: f.enterprise,
+        growthPercentage: f.growthPercentage,
+        confidence: f.confidence,
+      }));
+
+    // ---- Priority Inspection List ----
+    // High risk enterprises whose latest forecast is also declining
+    const decliningEnterpriseIds = new Set(
+      forecasts
+        .filter((f) => f.trend === "Decreasing" && f.enterprise)
+        .map((f) => String(f.enterprise._id))
+    );
+
+    const priorityInspectionList = highRiskEnterprises
+      .filter((risk) => risk.enterprise)
+      .map((risk) => ({
+        enterprise: risk.enterprise,
+        riskScore: risk.score,
+        riskLevel: risk.level,
+        forecastDeclining: decliningEnterpriseIds.has(String(risk.enterprise._id)),
+      }))
+      .sort((a, b) => {
+        if (a.forecastDeclining === b.forecastDeclining) {
+          return (b.riskScore || 0) - (a.riskScore || 0);
+        }
+        return a.forecastDeclining ? -1 : 1;
+      })
+      .slice(0, 10);
+
+    // ---- Top Recommendations (derived from the aggregated data above) ----
+    const topRecommendations = [];
+
+    if (riskTrends.high > 0) {
+      topRecommendations.push(
+        `${riskTrends.high} enterprise(s) are currently classified High Risk — prioritize field visits for the priority inspection list.`
+      );
+    }
+
+    const worstDistrict = [...districtHealthSummary].sort(
+      (a, b) => b.averageRiskScore - a.averageRiskScore
+    )[0];
+
+    if (worstDistrict && worstDistrict.averageRiskScore >= 40) {
+      topRecommendations.push(
+        `${worstDistrict.district || "An unspecified district"} has the highest average risk score (${worstDistrict.averageRiskScore}) — consider a targeted outreach program.`
+      );
+    }
+
+    if (forecastSummary.decreasing > 0) {
+      topRecommendations.push(
+        `${forecastSummary.decreasing} enterprise(s) show a declining revenue forecast — early intervention (credit counseling, scheme referral) is recommended.`
+      );
+    }
+
+    if (growthOpportunities.length > 0) {
+      topRecommendations.push(
+        `${growthOpportunities.length} enterprise(s) show strong growth potential and may be good candidates for expansion-linked government schemes.`
+      );
+    }
+
+    if (topRecommendations.length === 0) {
+      topRecommendations.push(
+        "No urgent risk or growth signals detected. Continue routine monitoring."
+      );
+    }
+
+    res.status(200).json({
+      totalEnterprises,
+      districtHealthSummary,
+      villagePerformanceSummary,
+      sectorAnalysis: sectorStats,
+      highRiskEnterprises: priorityInspectionList.map((item) => item.enterprise),
+      growthOpportunities,
+      riskTrends,
+      forecastSummary,
+      priorityInspectionList,
+      topRecommendations,
+    });
+  } catch (err) {
+    console.error("AI Insights Error:", err);
+
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};

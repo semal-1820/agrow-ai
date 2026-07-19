@@ -17,8 +17,12 @@ const officerRoutes = require("./routes/officerRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const schemeManagementRoutes = require("./routes/schemeManagementRoutes");
 const userRoutes = require("./routes/userRoutes");
+const aiRoutes = require("./routes/aiRoutes");
+const syncRoutes = require("./routes/syncRoutes");
+const localizationRoutes = require("./routes/localizationRoutes");
 
 const errorHandler = require("./middleware/errorMiddleware");
+const { globalLimiter } = require("./middleware/rateLimiter");
 
 const app = express();
 
@@ -29,6 +33,12 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// express-rate-limit was installed and built (middleware/rateLimiter.js)
+// but never applied anywhere. Applying the global limiter to every /api
+// route here; stricter per-route limiters (auth, forecast, officer) are
+// applied in their own route files.
+app.use("/api", globalLimiter);
 
 // Root route
 app.get("/", (req, res) => {
@@ -118,6 +128,11 @@ app.use(
   "/api/scheme-management",
   schemeManagementRoutes
 );
+
+// Phase 3
+app.use("/api/ai", aiRoutes);
+app.use("/api/sync", syncRoutes);
+app.use("/api/locale", localizationRoutes);
 
 // 404 handler
 // IMPORTANT: This must be after all API routes
