@@ -1,4 +1,5 @@
 const Notification = require("../models/Notification");
+const { sendError } = require("../utils/errorResponse");
 
 // Get all notifications for the logged-in user
 exports.getNotifications = async (req, res) => {
@@ -9,9 +10,7 @@ exports.getNotifications = async (req, res) => {
 
     res.status(200).json(notifications);
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -28,9 +27,7 @@ exports.getNotification = async (req, res) => {
 
     res.status(200).json(notification);
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -45,9 +42,7 @@ exports.createNotification = async (req, res) => {
 
     res.status(201).json(notification);
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -68,9 +63,7 @@ exports.markAsRead = async (req, res) => {
 
     res.status(200).json(notification);
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -89,8 +82,6 @@ exports.deleteNotification = async (req, res) => {
       message: "Notification deleted successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };

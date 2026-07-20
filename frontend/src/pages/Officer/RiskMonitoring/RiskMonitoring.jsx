@@ -20,6 +20,7 @@ import {
 import {
   getRiskMonitoring,
 } from '../../../services/officerService'
+import { PageSkeleton } from '../../../components/ui/Skeleton'
 
 const riskTone = {
   Low: 'low',
@@ -65,11 +66,7 @@ export default function RiskMonitoring() {
   }, [])
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading risk monitoring...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   const totalAssessments =

@@ -6,6 +6,7 @@ import { HiOutlineLightBulb } from 'react-icons/hi2'
 
 import { getEnterprises } from '../../services/enterpriseService'
 import { getEnterpriseHealth } from '../../services/healthService'
+import { PageSkeleton } from '../../components/ui/Skeleton'
 
 export default function EnterpriseHealth() {
   const [enterprise, setEnterprise] = useState(null)
@@ -55,11 +56,7 @@ export default function EnterpriseHealth() {
   }, [])
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading enterprise health...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   const healthScore =

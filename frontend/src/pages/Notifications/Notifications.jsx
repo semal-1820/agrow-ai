@@ -17,6 +17,7 @@ import {
   getNotifications,
   markNotificationAsRead,
 } from '../../services/notificationService'
+import { PageSkeleton } from '../../components/ui/Skeleton'
 
 const getNotificationIcon = (title = '') => {
   const text = title.toLowerCase()
@@ -115,11 +116,7 @@ export default function Notifications() {
   }
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading notifications...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   return (

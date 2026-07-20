@@ -32,6 +32,7 @@ import {
   getDistrictAnalytics,
   getRiskHeatmap,
 } from '../../../services/officerService'
+import { PageSkeleton } from '../../../components/ui/Skeleton'
 
 const riskTone = {
   Low: 'low',
@@ -89,11 +90,7 @@ export default function DistrictAnalytics() {
   }, [])
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading district analytics...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   const combinedData = districtData.map(

@@ -1,4 +1,5 @@
 const SchemeApplication = require("../models/SchemeApplication");
+const { sendError } = require("../utils/errorResponse");
 
 // Get all scheme applications
 exports.getApplications = async (req, res) => {
@@ -12,9 +13,7 @@ exports.getApplications = async (req, res) => {
 
     res.status(200).json(applications);
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -54,9 +53,7 @@ exports.updateApplicationStatus = async (req, res) => {
 
     res.status(200).json(updatedApplication);
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -153,9 +150,7 @@ exports.getSchemePerformance = async (req, res) => {
 
     res.status(200).json(performance);
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -175,9 +170,7 @@ exports.getBeneficiaries = async (req, res) => {
 
     res.status(200).json(beneficiaries);
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -216,8 +209,6 @@ exports.disburseApplication = async (req, res) => {
 
     res.status(200).json(application);
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };

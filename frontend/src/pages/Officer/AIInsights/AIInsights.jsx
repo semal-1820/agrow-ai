@@ -12,6 +12,7 @@ import {
 import {
   getAIInsights,
 } from '../../../services/officerService'
+import { PageSkeleton } from '../../../components/ui/Skeleton'
 
 export default function AIInsights() {
   const [data, setData] = useState(null)
@@ -46,11 +47,7 @@ export default function AIInsights() {
   }, [])
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading AI insights...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   const highRiskEnterprises =

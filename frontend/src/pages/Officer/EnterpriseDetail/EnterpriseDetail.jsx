@@ -28,6 +28,7 @@ import {
   getEnterpriseHealth,
   getEnterpriseForecast,
 } from '../../../services/officerService'
+import { PageSkeleton } from '../../../components/ui/Skeleton'
 
 const riskTone = {
   Low: 'low',
@@ -106,11 +107,7 @@ export default function EnterpriseDetail() {
   }, [id])
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading enterprise details...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   if (!enterprise) {

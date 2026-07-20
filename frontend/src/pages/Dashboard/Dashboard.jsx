@@ -27,6 +27,7 @@ import { getFinancialRecords } from '../../services/financialService'
 import { getRiskAssessment } from '../../services/riskService'
 import { getEnterpriseHealth } from '../../services/healthService'
 import { getNotifications } from '../../services/notificationService'
+import { PageSkeleton } from '../../components/ui/Skeleton'
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -64,10 +65,8 @@ export default function Dashboard() {
             await getRiskAssessment(enterpriseId)
 
           setRisk(riskData)
-        } catch (error) {
-          console.log(
-            'Risk assessment not available yet'
-          )
+        } catch {
+          // No risk assessment yet — expected on first visit.
         }
 
         try {
@@ -75,10 +74,8 @@ export default function Dashboard() {
             await getEnterpriseHealth(enterpriseId)
 
           setHealth(healthData)
-        } catch (error) {
-          console.log(
-            'Enterprise health not available yet'
-          )
+        } catch {
+          // No health score yet — expected on first visit.
         }
 
         try {
@@ -86,10 +83,8 @@ export default function Dashboard() {
             await getNotifications()
 
           setAlerts(notificationData)
-        } catch (error) {
-          console.log(
-            'Notifications not available'
-          )
+        } catch {
+          // No notifications yet.
         }
       } catch (error) {
         console.error(
@@ -139,11 +134,7 @@ export default function Dashboard() {
   }
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading dashboard...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   return (

@@ -1,4 +1,5 @@
 const Enterprise = require("../models/Enterprise");
+const { sendError } = require("../utils/errorResponse");
 
 // Get all enterprises
 exports.getEnterprises = async (req, res) => {
@@ -7,7 +8,7 @@ exports.getEnterprises = async (req, res) => {
 
     res.status(200).json(enterprises);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return sendError(res, err, { req });
   }
 };
 
@@ -25,7 +26,7 @@ exports.getEnterprise = async (req, res) => {
 
     res.json(enterprise);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return sendError(res, err, { req });
   }
 };
 
@@ -36,7 +37,7 @@ exports.createEnterprise = async (req, res) => {
 
     res.status(201).json(enterprise);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return sendError(res, err, { req });
   }
 };
 
@@ -55,7 +56,7 @@ exports.updateEnterprise = async (req, res) => {
 
     res.json(enterprise);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return sendError(res, err, { req });
   }
 };
 
@@ -70,6 +71,6 @@ exports.deleteEnterprise = async (req, res) => {
 
     res.json({ message: "Enterprise deleted successfully" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return sendError(res, err, { req });
   }
 };

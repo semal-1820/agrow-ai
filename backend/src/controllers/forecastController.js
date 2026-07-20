@@ -2,6 +2,7 @@ const FinancialRecord = require("../models/FinancialRecord");
 const ForecastResult = require("../models/ForecastResult");
 const Enterprise = require("../models/Enterprise");
 const { generateForecast } = require("../services/forecastService");
+const { sendError } = require("../utils/errorResponse");
 
 exports.forecastCashFlow = async (req, res) => {
   try {
@@ -60,10 +61,7 @@ exports.forecastCashFlow = async (req, res) => {
 
     res.status(200).json(savedForecast);
   } catch (err) {
-    console.error("Forecast Error:", err);
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { context: "Forecast Error:", req });
   }
 };
 
@@ -167,8 +165,7 @@ exports.getForecastComparison = async (req, res) => {
       overallAccuracy: result.overallAccuracy,
     });
   } catch (err) {
-    console.error("Forecast Comparison Error:", err);
-    res.status(500).json({ message: err.message });
+    return sendError(res, err, { context: "Forecast Comparison Error:", req });
   }
 };
 
@@ -203,7 +200,6 @@ exports.getForecastAccuracy = async (req, res) => {
       confidenceAtForecastTime: result.forecast.confidence,
     });
   } catch (err) {
-    console.error("Forecast Accuracy Error:", err);
-    res.status(500).json({ message: err.message });
+    return sendError(res, err, { context: "Forecast Accuracy Error:", req });
   }
 };

@@ -27,6 +27,7 @@ import {
   generateForecast,
   getForecast,
 } from '../../services/forecastService'
+import { PageSkeleton } from '../../components/ui/Skeleton'
 
 export default function ForecastStudio() {
   const [enterpriseId, setEnterpriseId] = useState(null)
@@ -55,10 +56,8 @@ export default function ForecastStudio() {
         try {
           const data = await getForecast(id)
           setForecast(data)
-        } catch (err) {
-          console.log(
-            'No existing forecast available.'
-          )
+        } catch {
+          // No forecast generated yet for this enterprise — expected on first visit.
         }
       } catch (err) {
         console.error(
@@ -128,11 +127,7 @@ export default function ForecastStudio() {
     : 0
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading forecast...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   return (

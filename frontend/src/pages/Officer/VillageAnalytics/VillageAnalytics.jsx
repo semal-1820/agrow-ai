@@ -34,6 +34,7 @@ import {
   getVillageAnalytics,
   getSectorDistribution,
 } from '../../../services/officerService'
+import { PageSkeleton } from '../../../components/ui/Skeleton'
 
 const COLORS = [
   '#2E7D32',
@@ -100,11 +101,7 @@ export default function VillageAnalytics() {
   }, [])
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading village analytics...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   const totalEnterprises = villageData.reduce(

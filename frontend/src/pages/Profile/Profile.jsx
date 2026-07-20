@@ -7,6 +7,7 @@ import {
   getProfile,
   updateProfile,
 } from '../../services/userService'
+import { PageSkeleton } from '../../components/ui/Skeleton'
 
 const inputCls =
   'mt-1 w-full border border-border dark:border-border-dark rounded-xl px-3 py-2.5 text-sm bg-transparent outline-none focus:border-primary-500'
@@ -109,11 +110,7 @@ export default function Profile() {
   }
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading profile...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   const displayName =

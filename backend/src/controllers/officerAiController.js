@@ -5,6 +5,7 @@ const FinancialRecord = require("../models/FinancialRecord");
 const { calculateHealth } = require("../services/healthService");
 const { calculateRisk } = require("../services/riskService");
 const { generateRecommendations } = require("../services/recommendationService");
+const { sendError } = require("../utils/errorResponse");
 
 exports.getAIDashboard = async (req, res) => {
   try {
@@ -200,7 +201,6 @@ exports.getAIDashboard = async (req, res) => {
       topRecommendations,
     });
   } catch (err) {
-    console.error("Officer AI Dashboard Error:", err);
-    res.status(500).json({ message: err.message });
+    return sendError(res, err, { context: "Officer AI Dashboard Error:", req });
   }
 };

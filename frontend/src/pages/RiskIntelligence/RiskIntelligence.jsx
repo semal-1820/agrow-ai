@@ -16,6 +16,7 @@ import {
   generateRiskAssessment,
   getRiskAssessment,
 } from '../../services/riskService'
+import { PageSkeleton } from '../../components/ui/Skeleton'
 
 const toneFor = (level) => {
   if (level === 'Low') return 'low'
@@ -55,10 +56,8 @@ export default function RiskIntelligence() {
             )
 
           setRisk(riskData)
-        } catch (err) {
-          console.log(
-            'No existing risk assessment found.'
-          )
+        } catch {
+          // No risk assessment yet — expected on first visit.
         }
       } catch (err) {
         console.error(
@@ -111,11 +110,7 @@ export default function RiskIntelligence() {
   const level = risk?.level || 'Not Assessed'
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading risk intelligence...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   return (

@@ -2,6 +2,7 @@ const Enterprise = require("../models/Enterprise");
 const RiskAssessment = require("../models/RiskAssessment");
 const FinancialRecord = require("../models/FinancialRecord");
 const ForecastResult = require("../models/ForecastResult");
+const { sendError } = require("../utils/errorResponse");
 
 
 // ==========================================
@@ -38,14 +39,7 @@ exports.getDashboard = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(
-      "Officer Dashboard Error:",
-      err
-    );
-
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { context: "Officer Dashboard Error:", req });
   }
 };
 
@@ -73,9 +67,7 @@ exports.getEnterpriseRegistry = async (
       enterprises
     );
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -108,9 +100,7 @@ exports.getEnterpriseById = async (
       enterprise
     );
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -135,9 +125,7 @@ exports.getEnterpriseFinancials = async (
       records
     );
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -169,9 +157,7 @@ exports.getEnterpriseRisk = async (
 
     res.status(200).json(risk);
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -429,9 +415,7 @@ exports.getEnterpriseHealth = async (
       recommendations,
     });
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -465,9 +449,7 @@ exports.getEnterpriseForecast = async (
       forecast
     );
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -530,9 +512,7 @@ exports.getDistrictAnalytics = async (
       data
     );
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -603,9 +583,7 @@ exports.getVillageAnalytics = async (
       data
     );
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -653,9 +631,7 @@ exports.getSectorDistribution = async (
       data
     );
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -683,9 +659,7 @@ exports.getRiskMonitoring = async (
       risks
     );
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -793,9 +767,7 @@ exports.getRiskHeatmap = async (
       result
     );
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -1039,10 +1011,6 @@ exports.getAIInsights = async (req, res) => {
       topRecommendations,
     });
   } catch (err) {
-    console.error("AI Insights Error:", err);
-
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { context: "AI Insights Error:", req });
   }
 };

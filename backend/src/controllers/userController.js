@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const { sendError } = require("../utils/errorResponse");
 
 // Get logged-in user's profile
 exports.getProfile = async (req, res) => {
@@ -15,11 +16,7 @@ exports.getProfile = async (req, res) => {
 
     res.status(200).json(user);
   } catch (err) {
-    console.error("Get Profile Error:", err);
-
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { context: "Get Profile Error:", req });
   }
 };
 
@@ -74,10 +71,6 @@ exports.updateProfile = async (req, res) => {
       role: updatedUser.role,
     });
   } catch (err) {
-    console.error("Update Profile Error:", err);
-
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { context: "Update Profile Error:", req });
   }
 };

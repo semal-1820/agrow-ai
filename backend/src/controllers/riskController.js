@@ -3,6 +3,7 @@ const RiskAssessment = require("../models/RiskAssessment");
 const { calculateRisk } = require("../services/riskService");
 const Enterprise = require("../models/Enterprise");
 const Notification = require("../models/Notification");
+const { sendError } = require("../utils/errorResponse");
 exports.assessRisk = async (req, res) => {
   try {
     const { enterpriseId } = req.params;
@@ -29,11 +30,7 @@ exports.assessRisk = async (req, res) => {
 
     res.status(201).json(assessment);
   } catch (err) {
-    console.error("Risk Assessment Error:", err);
-
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { context: "Risk Assessment Error:", req });
   }
 };
 
@@ -53,8 +50,6 @@ exports.getRiskAssessment = async (req, res) => {
 
     res.status(200).json(assessment);
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };

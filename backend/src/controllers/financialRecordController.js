@@ -1,5 +1,7 @@
 const FinancialRecord = require("../models/FinancialRecord");
 const { generateAlertsForEnterprise } = require("../services/alertService");
+const { sendError } = require("../utils/errorResponse");
+const logger = require("../utils/logger");
 
 // Get all records
 exports.getFinancialRecords = async (req, res) => {
@@ -11,7 +13,7 @@ exports.getFinancialRecords = async (req, res) => {
 
     res.status(200).json(records);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return sendError(res, err, { req });
   }
 };
 
@@ -31,7 +33,7 @@ exports.getFinancialRecord = async (req, res) => {
 
     res.json(record);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return sendError(res, err, { req });
   }
 };
 
@@ -46,11 +48,11 @@ exports.createFinancialRecord = async (req, res) => {
     // that was already sent above.
     if (record.enterprise) {
       generateAlertsForEnterprise(record.enterprise).catch((err) =>
-        console.error("Post-create alert generation failed:", err.message)
+        logger.warn("Post-create alert generation failed", { error: err.message })
       );
     }
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return sendError(res, err, { req });
   }
 };
 
@@ -73,11 +75,11 @@ exports.updateFinancialRecord = async (req, res) => {
 
     if (record.enterprise) {
       generateAlertsForEnterprise(record.enterprise).catch((err) =>
-        console.error("Post-update alert generation failed:", err.message)
+        logger.warn("Post-update alert generation failed", { error: err.message })
       );
     }
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return sendError(res, err, { req });
   }
 };
 
@@ -96,6 +98,6 @@ exports.deleteFinancialRecord = async (req, res) => {
       message: "Financial record deleted successfully",
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return sendError(res, err, { req });
   }
 };

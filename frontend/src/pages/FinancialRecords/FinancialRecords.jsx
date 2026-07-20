@@ -27,6 +27,7 @@ import {
 
 import { getEnterprises } from '../../services/enterpriseService'
 import { getFinancialRecords } from '../../services/financialService'
+import { PageSkeleton } from '../../components/ui/Skeleton'
 
 const tabs = [
   'Overview',
@@ -140,11 +141,7 @@ export default function FinancialRecords() {
     )
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading financial records...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   return (

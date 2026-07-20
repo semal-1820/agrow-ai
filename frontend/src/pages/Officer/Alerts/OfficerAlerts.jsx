@@ -4,6 +4,7 @@ import Card from '../../../components/ui/Card'
 import Badge from '../../../components/ui/Badge'
 import { HiOutlineExclamationTriangle } from 'react-icons/hi2'
 import { getOfficerAlerts } from '../../../services/officerService'
+import { PageSkeleton } from '../../../components/ui/Skeleton'
 
 export default function OfficerAlerts() {
   const [alerts, setAlerts] = useState([])
@@ -42,11 +43,7 @@ export default function OfficerAlerts() {
   }, [])
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading alerts...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   return (

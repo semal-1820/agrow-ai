@@ -7,6 +7,7 @@ const {
   estimateApprovalProbability,
 } = require("../services/schemeService");
 const { calculateRisk } = require("../services/riskService");
+const { sendError } = require("../utils/errorResponse");
 
 // Get all government schemes
 exports.getSchemes = async (req, res) => {
@@ -17,11 +18,7 @@ exports.getSchemes = async (req, res) => {
 
     res.status(200).json(schemes);
   } catch (err) {
-    console.error("Get Schemes Error:", err);
-
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { context: "Get Schemes Error:", req });
   }
 };
 
@@ -32,11 +29,7 @@ exports.createScheme = async (req, res) => {
 
     res.status(201).json(scheme);
   } catch (err) {
-    console.error("Create Scheme Error:", err);
-
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { context: "Create Scheme Error:", req });
   }
 };
 
@@ -96,13 +89,6 @@ exports.getEligibleSchemes = async (req, res) => {
       recommendations,
     });
   } catch (err) {
-    console.error(
-      "Scheme Recommendation Error:",
-      err
-    );
-
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { context: "Scheme Recommendation Error:", req });
   }
 };

@@ -1,5 +1,6 @@
 const FinancialRecord = require("../models/FinancialRecord");
 const { calculateHealth } = require("../services/healthService");
+const { sendError } = require("../utils/errorResponse");
 
 exports.getEnterpriseHealth = async (req, res) => {
   try {
@@ -22,10 +23,6 @@ exports.getEnterpriseHealth = async (req, res) => {
       ...health,
     });
   } catch (err) {
-    console.error("Enterprise Health Error:", err);
-
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { context: "Enterprise Health Error:", req });
   }
 };

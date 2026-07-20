@@ -18,6 +18,7 @@ import {
   getSchemePerformance,
   getBeneficiaries,
 } from '../../../services/schemeManagementService'
+import { PageSkeleton } from '../../../components/ui/Skeleton'
 
 const statusTone = {
   Pending: 'medium',
@@ -153,11 +154,7 @@ export default function SchemeManagement() {
         )
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading scheme management...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   return (

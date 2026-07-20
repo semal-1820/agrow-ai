@@ -18,6 +18,7 @@ import {
   getReports,
   downloadReport,
 } from '../../services/reportService'
+import { PageSkeleton } from '../../components/ui/Skeleton'
 
 const reportTypes = [
   {
@@ -196,11 +197,7 @@ export default function Reports() {
   }
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading reports...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   return (

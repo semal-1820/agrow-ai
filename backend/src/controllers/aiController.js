@@ -9,6 +9,7 @@ const { calculateSchemeMatch } = require("../services/schemeService");
 const { generateRecommendations } = require("../services/recommendationService");
 const { generateInsights } = require("../services/insightService");
 const { chat } = require("../services/aiAssistantService");
+const { sendError } = require("../utils/errorResponse");
 
 // Module 1 - AI Chat Assistant
 exports.chatWithAssistant = async (req, res) => {
@@ -27,8 +28,7 @@ exports.chatWithAssistant = async (req, res) => {
 
     res.status(200).json(result);
   } catch (err) {
-    console.error("AI Chat Error:", err);
-    res.status(500).json({ message: err.message });
+    return sendError(res, err, { context: "AI Chat Error:", req });
   }
 };
 
@@ -72,8 +72,7 @@ exports.getRecommendations = async (req, res) => {
 
     res.status(200).json({ enterprise: enterpriseId, recommendations });
   } catch (err) {
-    console.error("Recommendation Error:", err);
-    res.status(500).json({ message: err.message });
+    return sendError(res, err, { context: "Recommendation Error:", req });
   }
 };
 
@@ -102,7 +101,6 @@ exports.getInsights = async (req, res) => {
 
     res.status(200).json({ enterprise: enterpriseId, insights });
   } catch (err) {
-    console.error("Insights Error:", err);
-    res.status(500).json({ message: err.message });
+    return sendError(res, err, { context: "Insights Error:", req });
   }
 };

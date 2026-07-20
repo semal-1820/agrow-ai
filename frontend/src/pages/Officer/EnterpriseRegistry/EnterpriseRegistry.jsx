@@ -13,6 +13,7 @@ import {
 import { HiOutlineMagnifyingGlass } from 'react-icons/hi2'
 
 import { getEnterpriseRegistry } from '../../../services/officerService'
+import { PageSkeleton } from '../../../components/ui/Skeleton'
 
 const riskTone = {
   Low: 'low',
@@ -114,11 +115,7 @@ export default function EnterpriseRegistry() {
   ])
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading enterprise registry...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   return (

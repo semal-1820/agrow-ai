@@ -14,6 +14,7 @@ import { HiOutlinePencilSquare } from 'react-icons/hi2'
 
 import { getEnterprises } from '../../services/enterpriseService'
 import { getFinancialRecords } from '../../services/financialService'
+import { PageSkeleton } from '../../components/ui/Skeleton'
 
 const tabs = [
   'Overview',
@@ -73,11 +74,7 @@ export default function MyEnterprise() {
   }, [])
 
   if (loading) {
-    return (
-      <div className="p-6">
-        Loading enterprise...
-      </div>
-    )
+    return <PageSkeleton />
   }
 
   if (!enterprise) {

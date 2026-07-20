@@ -83,43 +83,20 @@ export const getOfficerAlerts = async () => {
 }
 
 export const getPortfolioRiskReport = async () => {
-  const response = await api.get(
-    '/officer/reports/portfolio-risk',
-    {
-      responseType: 'blob',
-    }
-  )
-
+  const response = await api.get('/officer/reports/portfolio-risk')
   return response.data
 }
 
 export const getVillagePerformanceReport = async () => {
-  const response = await api.get(
-    '/officer/reports/village-performance',
-    {
-      responseType: 'blob',
-    }
-  )
-
+  const response = await api.get('/officer/reports/village-performance')
   return response.data
 }
 
 export const getDefaultPredictionReport = async () => {
-  const response = await api.get(
-    '/officer/reports/default-prediction',
-    {
-      responseType: 'blob',
-    }
-  )
-
+  const response = await api.get('/officer/reports/default-prediction')
   return response.data
 }
 export const getAIInsights = async () => {
   const response = await api.get('/officer/ai-insights')
-  return response.data
-}
-
-export const generateAIInsights = async () => {
-  const response = await api.post('/officer/ai-insights/generate')
   return response.data
 }

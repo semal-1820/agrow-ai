@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Enterprise = require("../models/Enterprise");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { sendError } = require("../utils/errorResponse");
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -101,14 +102,7 @@ exports.register = async (req, res) => {
       enterprise,
     });
   } catch (err) {
-    console.error(
-      "Registration Error:",
-      err
-    );
-
-    return res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { context: "Registration Error:", req });
   }
 };
 
@@ -165,14 +159,7 @@ exports.login = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(
-      "Login Error:",
-      err
-    );
-
-    return res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { context: "Login Error:", req });
   }
 };
 
@@ -193,13 +180,6 @@ exports.profile = async (req, res) => {
       user
     );
   } catch (err) {
-    console.error(
-      "Profile Error:",
-      err
-    );
-
-    return res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { context: "Profile Error:", req });
   }
 };

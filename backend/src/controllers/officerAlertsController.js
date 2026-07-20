@@ -1,4 +1,5 @@
 const RiskAssessment = require("../models/RiskAssessment");
+const { sendError } = require("../utils/errorResponse");
 
 exports.getOfficerAlerts = async (req, res) => {
   try {
@@ -31,13 +32,6 @@ exports.getOfficerAlerts = async (req, res) => {
 
     res.status(200).json(alerts);
   } catch (err) {
-    console.error(
-      "Officer Alerts Error:",
-      err
-    );
-
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { context: "Officer Alerts Error:", req });
   }
 };

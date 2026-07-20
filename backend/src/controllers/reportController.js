@@ -5,6 +5,7 @@ const Enterprise = require("../models/Enterprise");
 const FinancialRecord = require("../models/FinancialRecord");
 const ForecastResult = require("../models/ForecastResult");
 const RiskAssessment = require("../models/RiskAssessment");
+const { sendError } = require("../utils/errorResponse");
 
 const {
   generatePDF,
@@ -89,11 +90,7 @@ exports.generateReport = async (req, res) => {
 
     res.status(201).json(report);
   } catch (err) {
-    console.error("Report Generation Error:", err);
-
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { context: "Report Generation Error:", req });
   }
 };
 
@@ -108,9 +105,7 @@ exports.getReports = async (req, res) => {
 
     res.status(200).json(reports);
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -128,9 +123,7 @@ exports.getReport = async (req, res) => {
 
     res.status(200).json(report);
   } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { req });
   }
 };
 
@@ -158,10 +151,6 @@ exports.downloadReport = async (req, res) => {
 
     res.download(filePath);
   } catch (err) {
-    console.error("Report Download Error:", err);
-
-    res.status(500).json({
-      message: err.message,
-    });
+    return sendError(res, err, { context: "Report Download Error:", req });
   }
 };
