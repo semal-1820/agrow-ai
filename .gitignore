@@ -11,6 +11,11 @@ __pycache__/
 
 # Environment
 .env
+.env.*
+!.env.example
+backend/.env
+frontend/.env
+frontend/.env.local
 
 # IDE
 .vscode/
@@ -21,14 +26,15 @@ __pycache__/
 
 # Logs
 *.log
+backend/logs/*
+!backend/logs/.gitkeep
 
 # Coverage
 coverage/
-node_modules/
-.env
-.env.*
-!.env.example
-backend/.env
-frontend/.env
-frontend/.env.local
-dist/
+
+# Generated data - backups can contain full DB dumps (enterprise/user
+# financial data); uploads are generated PDF reports. Neither should
+# ever be committed.
+backend/backups/
+backend/uploads/*
+!backend/uploads/.gitkeep
